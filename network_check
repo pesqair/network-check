@@ -1,0 +1,34 @@
+#!/bin/sh
+
+WIFI_INTERFACE=en0
+WIRED_INTERFACE=en4
+
+
+WIFI_STATUS=$(ifconfig $WIFI_INTERFACE | grep status | awk -F' ' '{ print$2 }')
+
+if [[ ("$(ifconfig $WIRED_INTERFACE | grep status | awk -F' ' '{ print$2 }')" = "active" ) ]]
+then
+	WIRED_STATUS="active"
+else
+	WIRED_STATUS="disconnected"
+fi
+
+echo "------------Network Check RUN------------"
+echo $(date)
+echo "WIFI_STATUS: $WIFI_STATUS"
+echo "WIRED_STATUS: $WIRED_STATUS"
+
+
+if [[ ("$WIRED_STATUS" = "active" ) && ("$WIFI_STATUS" = "active" ) ]]
+then
+	networksetup -getairportnetwork $WIFI_INTERFACE | awk -F':' '{ print$2 }' | cut -c 2- > /tmp/wifi_ssid
+	read WIFI_SSID < /tmp/wifi_ssid
+	sudo /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport "$WIFI_INTERFACE" -z
+	echo "Action: WiFi disconnecting from $WIFI_SSID"
+elif [[ ("$WIRED_STATUS" != "active" ) && ("$WIFI_STATUS" != "active" ) ]]; then
+	read WIFI_SSID < /tmp/wifi_ssid
+	networksetup -setairportnetwork $WIFI_INTERFACE "$WIFI_SSID"
+	echo "Action: WiFi connecting to $WIFI_SSID"
+else
+	echo "Action: NO CHANGE"
+fi
