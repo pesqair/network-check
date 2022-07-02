@@ -5,13 +5,13 @@
 	<key>Label</key>
 	<string>local.network_check</string>
 	<key>Program</key>
-	<string>/opt/network_check</string>
+	<string>/Users/YOURUSER/network_check</string>
 	<key>RunAtLoad</key>
 	<false/>
 	<key>StandardErrorPath</key>
-	<string>/Library/Logs/local.network_check.stderr</string>
+	<string>/Library/Logs/local.network_check.error.log</string>
 	<key>StandardOutPath</key>
-	<string>/Library/Logs/local.network_check.stdout</string>
+	<string>/Library/Logs/local.network_check.log</string>
 	<key>WatchPaths</key>
 	<array>
 		<string>/private/var/run/resolv.conf</string>
