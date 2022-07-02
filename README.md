@@ -5,3 +5,4 @@ Tested on macOS Monterey 12.4
 
 local.network_check.plist runs by watching path /private/var/run/resolv.conf for changes. Once a change is detected (network devices changed) it runs the network_check script. 
 
+more details at https://it.digitaino.com/network-check/
