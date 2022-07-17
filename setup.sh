@@ -73,12 +73,12 @@ uninstall() {
         rm -i $FILE
         launchctl stop local.network_autoswitcher.plist
         launchctl unload local.network_autoswitcher.plist
-        echo "$0: network_autoswitcher.sh has been uninstalled successfully."
+        echo "$0: network_autoswitcher.sh and its launch agent have been uninstalled successfully."
         exit 0
 
     elif checkInstalled; then
 
-        err "$0: ERROR: network_autoswitcher.sh is not installed, nothing to uninstall."
+        err "$0: ERROR: network_autoswitcher.sh was not found in the default location, bailing out."
         exit 1
 
     fi

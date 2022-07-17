@@ -27,7 +27,7 @@ readonly WIRED_INTERFACE=$(
 	| grep -A 1 "LAN" \
 	| grep "Device:" \
 	| awk '{print $2}'
-	)
+	) # You may need to tweak what this greps for depending on your actual hardware
 
 readonly WIFI_STATUS=$(
 	ifconfig $WIFI_INTERFACE \
@@ -41,10 +41,20 @@ readonly WIRED_STATUS=$(
 	| awk '{print $2}'
 	)
 
+readonly WIFI_SSID=$(
+	/System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I  \
+	| awk -F' SSID: '  '/ SSID: / {print $2}'
+	)
+
+readonly DEFAUT_SSID=$(
+	cat ~/.ssid
+)
+
+
 
 wiredIsConnected() {
 
-	if [[ "${WIRED_STATUS}" == "active" ]];then
+	if [[ "${WIRED_STATUS}" == "active" ]]; then
 		return 1
 
 	# elif [[ "${WIRED_STATUS}" == "inactive" ]]; then
@@ -61,6 +71,7 @@ wiredIsConnected() {
 wifiIsConnected() {
 
 	if [[ "${WIFI_STATUS}" == "active" ]]; then
+		echo $WIFI_SSID > ~/.ssid
 		return 1
 
 	elif [[ "${WIFI_STATUS}" == "inactive" ]]; then
@@ -75,15 +86,20 @@ wifiIsConnected() {
 turnOffWifi() {
 
 	# Comment out the below osascript if you want to disable the notification toasts
-	osascript -e 'display notification "Ethernet connected, turning off Wi-Fi..." with title "Network Status" sound name "Glass.aiff"'
-	networksetup -setairportpower $WIFI_INTERFACE off
+	osascript -e 'display notification "Ethernet connected, disassociating from Wi-Fi network..." with title "Network Status" sound name "Glass.aiff"'
+
+	# networksetup -setairportpower $WIFI_INTERFACE off
+	sudo /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport "$WIFI_INTERFACE" -z
+
 }
 
 turnOnWifi() {
 
-	networksetup -setairportpower $WIFI_INTERFACE on
 	# Comment out the below osascript if you want to disable the notification toasts
-	osascript -e 'display notification "Ethernet disconnected, turning on Wi-Fi..." with title "Network Status" sound name "Glass.aiff"'
+	osascript -e 'display notification "Ethernet disconnected, reconnecting to last known Wi-Fi network..." with title "Network Status" sound name "Glass.aiff"'
+
+	# networksetup -setairportpower $WIFI_INTERFACE on
+	networksetup -setairportnetwork $WIFI_INTERFACE $DEFAUT_SSID
 }
 
 main() {
@@ -95,7 +111,6 @@ main() {
 		turnOnWifi
 
 	fi
-
 }
 
 main
