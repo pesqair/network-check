@@ -2,8 +2,8 @@
 
 WIFI_INTERFACE=en0
 WIRED_INTERFACE=en4
-DEFAULT_SSID="Your SSID"
-TEMP_LOCATION="/Users/YOURUSER/.wifi_ssid"
+DEFAULT_SSID="Digitaino Turbo"
+TEMP_LOCATION="/Users/pesqair/.wifi_ssid"
 
 
 WIFI_STATUS=$(ifconfig $WIFI_INTERFACE | grep status | awk -F' ' '{ print$2 }')
@@ -27,6 +27,7 @@ then
 	read WIFI_SSID < $TEMP_LOCATION
 	sudo /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport "$WIFI_INTERFACE" -z
 	echo "Action: WiFi disconnecting from $WIFI_SSID"
+	osascript -e 'display notification "Ethernet connected, disassociating from Wi-Fi network..." with title "Network Status" sound name "Glass.aiff"'
 elif [[ ("$WIRED_STATUS" != "active" ) && ("$WIFI_STATUS" != "active" ) ]]; then
 	read WIFI_SSID < $TEMP_LOCATION
 	if [[ -z "$WIFI_SSID"  ]]; then
@@ -35,6 +36,7 @@ elif [[ ("$WIRED_STATUS" != "active" ) && ("$WIFI_STATUS" != "active" ) ]]; then
 	fi
 	networksetup -setairportnetwork $WIFI_INTERFACE "$WIFI_SSID"
 	echo "Action: WiFi connecting to $WIFI_SSID"
+	osascript -e 'display notification "Ethernet disconnected, reconnecting to last known Wi-Fi network..." with title "Network Status" sound name "Glass.aiff"'
 else
 	echo "Action: NO CHANGE"
 fi
